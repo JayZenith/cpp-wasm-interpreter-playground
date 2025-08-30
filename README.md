@@ -1,80 +1,33 @@
-cpp-wasm-interpreter-playground
+# cpp-wasm-interpreter-playground
 
-Run a C++ interpreter compiled to WebAssembly directly in your browser.
+Run a **C++ interpreter compiled to WebAssembly** directly in your browser.
 
-This project demonstrates a full C++ interpreter with a tokenizer, parser, and AST evaluation, all compiled to WebAssembly (WASM) and exposed in a React-based playground. You can write, run, and reset code snippets directly in the browser—no server required.
-Key Features
+This project demonstrates a minimal but complete C++ interpreter—including tokenizer, parser, and AST evaluation—compiled to WebAssembly (WASM) and exposed in a React-based playground. You can **write, run, and reset C++ code snippets instantly in the browser**, with no server required.
 
-    C++ Interpreter: A minimal but real interpreter that supports variables, expressions, conditionals, and basic statements.
+---
 
-    WebAssembly Compilation: The C++ code is compiled to WASM via Emscripten, making the interpreter runnable in the browser.
+## 🚀 Key Features
 
-    Browser Playground: A React frontend with a code editor, run and reset buttons, and built-in snippet examples.
+- **C++ Interpreter**  
+  A minimal but real interpreter supporting variables, expressions, conditionals, and basic statements.
 
-    Real-time Output: Immediate evaluation of your code with console-like output.
+- **WebAssembly Compilation**  
+  The interpreter is written in C++17 and compiled to WASM via **Emscripten**, making it runnable in any modern browser.
 
-    Startup-ready Demo: This project showcases how to bridge low-level systems programming with modern front-end deployment.
+- **Browser Playground**  
+  A React frontend with a built-in editor, run/reset buttons, and example snippets.
 
-Getting Started
-Clone the repo
+- **Real-Time Output**  
+  Immediate code evaluation with a console-like output area.
 
-git clone [https://github.com/](https://github.com/)JayZenith/cpp-wasm-interpreter-playground.git
+- **Startup-Ready Demo**  
+  Demonstrates how to bridge low-level systems programming with modern front-end deployment.
+
+---
+
+## 📦 Getting Started
+
+Clone the repo:
+```bash
+git clone https://github.com/JayZenith/cpp-wasm-interpreter-playground.git
 cd cpp-wasm-interpreter-playground
-
-Install dependencies
-
-npm install
-
-Run locally
-
-npm start
-
-Open http://localhost:3000 to access the playground.
-How It Works
-Interpreter
-
-The interpreter tokenizes the input, builds an Abstract Syntax Tree (AST), and evaluates statements using a simple environment. It handles numbers, strings, booleans, conditionals, variable declarations, and assignments.
-WebAssembly
-
-The C++ interpreter is compiled to WASM using Emscripten. The WASM module exposes two key functions to JavaScript:
-
-    runCode(code: string): string – executes code and returns the output.
-
-    resetInterpreter() – clears the interpreter's state.
-
-React Playground
-
-The front end loads the WASM module dynamically in the browser, providing an editor and an output console. It also includes several example snippets to help you get started.
-Tech Stack
-
-    C++17: Used for the interpreter logic, AST, and parser.
-
-    WebAssembly (WASM): For executing the C++ code directly in the browser.
-
-    Emscripten: The toolchain used to compile C++ to WASM and generate JavaScript bindings.
-
-    React + TypeScript: Used to build the playground's front end.
-
-    npm / Webpack / Create React App: The development environment and build system.
-
-Future Directions
-
-    Add function definitions and loops.
-
-    Improve the editor experience with syntax highlighting and auto-indentation.
-
-    Optimize WASM performance for larger code snippets.
-
-    Package as a standalone static web app for deployment on platforms like GitHub Pages or Vercel.
-
-Why This Project Matters
-
-    For Startups: It demonstrates a strong understanding of systems-level programming, WASM integration, and modern front-end deployment practices.
-
-    For Developer Tooling: It highlights the ability to bridge low-level language implementation with real-world web applications.
-
-    For Bun / JS Runtime Enthusiasts: It showcases knowledge of interpreters, WASM execution, and runtime environment integration.
-
-License
-
-MIT License – feel free to fork and experiment.
