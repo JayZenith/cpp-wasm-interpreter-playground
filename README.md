@@ -6,6 +6,10 @@ This project demonstrates a minimal but complete C++ interpreter—including tok
 
 ---
 
+## Demo
+
+Try the live demo: [cpp-wasm-interpreter-playground.vercel.app/](https://cpp-wasm-interpreter-playground.vercel.app/)
+
 ## 🚀 Key Features
 
 - **C++ Interpreter**  
