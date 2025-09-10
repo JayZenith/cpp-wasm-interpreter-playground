@@ -4,11 +4,10 @@ import React, { useState, useEffect } from "react";
 const SNIPPETS = [
   `let x = 5;
 print(x + 2);`,
-  `if (true) {
-  print("Yes");
-} else {
-  print("No");
-}`
+  `let counter = 0;
+counter = counter + 1;
+print(counter);  
+`
 ];
 
 export const PlaygroundWrapper = () => {

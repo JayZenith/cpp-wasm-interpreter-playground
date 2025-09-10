@@ -46,14 +46,6 @@ public:
         }
         return "nil";
     }
-    
-    bool isTruthy() const {
-        switch (type_) {
-            case BOOLEAN: return boolean_;
-            case NIL: return false;
-            default: return true;
-        }
-    }
 
 private:
     Type type_;
@@ -65,9 +57,8 @@ private:
 // ==== LEXER (TOKENIZER) ====
 enum TokenType {
     NUMBER, STRING, IDENTIFIER,
-    TRUE, FALSE, NIL, IF, ELSE, LET,
+    TRUE, FALSE, NIL, LET,
     PLUS, MINUS, MULTIPLY, DIVIDE,
-    EQUAL_EQUAL, NOT_EQUAL, LESS, GREATER,
     ASSIGN,
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     SEMICOLON,
@@ -133,8 +124,6 @@ private:
         if (text == "true") type = TRUE;
         else if (text == "false") type = FALSE;
         else if (text == "nil") type = NIL;
-        else if (text == "if") type = IF;
-        else if (text == "else") type = ELSE;
         else if (text == "let") type = LET;
         
         addToken(type);
@@ -169,10 +158,7 @@ public:
             case '-': addToken(MINUS); break;
             case '*': addToken(MULTIPLY); break;
             case '/': addToken(DIVIDE); break;
-            case '<': addToken(LESS); break;
-            case '>': addToken(GREATER); break;
-            case '=': addToken(match('=') ? EQUAL_EQUAL : ASSIGN); break;
-            case '!': if (match('=')) addToken(NOT_EQUAL); break;
+            case '=': addToken(match('=') ? ASSIGN : ASSIGN); break;
             case ' ': case '\r': case '\t': break;
             case '\n': line_++; addToken(NEWLINE); break;
             case '"': string(); break;
@@ -263,18 +249,6 @@ public:
     void execute(Environment& env) override;
 };
 
-class IfStmt : public Stmt {
-    std::unique_ptr<Expr> condition_;
-    std::unique_ptr<Stmt> thenBranch_;
-    std::unique_ptr<Stmt> elseBranch_;
-public:
-    IfStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, 
-           std::unique_ptr<Stmt> elseBranch = nullptr)
-        : condition_(std::move(condition)), thenBranch_(std::move(thenBranch)), 
-          elseBranch_(std::move(elseBranch)) {}
-    void execute(Environment& env) override;
-};
-
 class BlockStmt : public Stmt {
     std::vector<std::unique_ptr<Stmt>> statements_;
 public:
@@ -339,10 +313,6 @@ Value BinaryExpr::evaluate(Environment& env) {
         case MINUS: return Value(left.asNumber() - right.asNumber());
         case MULTIPLY: return Value(left.asNumber() * right.asNumber());
         case DIVIDE: return Value(left.asNumber() / right.asNumber());
-        case EQUAL_EQUAL: return Value(left.toString() == right.toString());
-        case NOT_EQUAL: return Value(left.toString() != right.toString());
-        case LESS: return Value(left.asNumber() < right.asNumber());
-        case GREATER: return Value(left.asNumber() > right.asNumber());
     }
     throw std::runtime_error("Invalid binary operation");
 }
@@ -359,15 +329,6 @@ void LetStmt::execute(Environment& env) {
         value = initializer_->evaluate(env);
     }
     env.define(name_, value);
-}
-
-void IfStmt::execute(Environment& env) {
-    Value condition = condition_->evaluate(env);
-    if (condition.isTruthy()) {
-        thenBranch_->execute(env);
-    } else if (elseBranch_) {
-        elseBranch_->execute(env);
-    }
 }
 
 void BlockStmt::execute(Environment& env) {
@@ -425,7 +386,6 @@ public:
     
     std::unique_ptr<Stmt> statement() {
         if (match({LET})) return letStatement();
-        if (match({IF})) return ifStatement();
         if (match({LEFT_BRACE})) return blockStatement();
         
         if (check(IDENTIFIER) && peek().lexeme == "print") {
@@ -450,18 +410,6 @@ public:
         return std::make_unique<LetStmt>(name.lexeme, std::move(initializer));
     }
     
-    std::unique_ptr<Stmt> ifStatement() {
-        consume(LEFT_PAREN, "Expected '(' after 'if'");
-        auto condition = expression();
-        consume(RIGHT_PAREN, "Expected ')' after if condition");
-        auto thenBranch = statement();
-        std::unique_ptr<Stmt> elseBranch = nullptr;
-        if (match({ELSE})) {
-            elseBranch = statement();
-        }
-        return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
-    }
-    
     std::unique_ptr<Stmt> blockStatement() {
         std::vector<std::unique_ptr<Stmt>> statements;
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
@@ -483,7 +431,7 @@ public:
     std::unique_ptr<Expr> expression() { return assignment(); }
     
     std::unique_ptr<Expr> assignment() {
-        auto expr = equality();
+        auto expr = term();
         if (match({ASSIGN})) {
             auto value = assignment();
             if (auto varExpr = dynamic_cast<VariableExpr*>(expr.get())) {
@@ -492,26 +440,6 @@ public:
                 return std::make_unique<AssignExpr>(name, std::move(value));
             }
             throw std::runtime_error("Invalid assignment target");
-        }
-        return expr;
-    }
-    
-    std::unique_ptr<Expr> equality() {
-        auto expr = comparison();
-        while (match({NOT_EQUAL, EQUAL_EQUAL})) {
-            Token op = previous();
-            auto right = comparison();
-            expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-        }
-        return expr;
-    }
-    
-    std::unique_ptr<Expr> comparison() {
-        auto expr = term();
-        while (match({GREATER, LESS})) {
-            Token op = previous();
-            auto right = term();
-            expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
         }
         return expr;
     }
@@ -622,3 +550,4 @@ int main() {
     return 0;
 }
 #endif
+
