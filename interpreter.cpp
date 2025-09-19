@@ -16,16 +16,18 @@
 class Value;
 class Environment;
 
-// ==== VALUE SYSTEM ====
+// VALUE SYSTEM 
 class Value {
 public:
     enum Type { NUMBER, STRING, BOOLEAN, NIL };
     
+    //Store types and values 
     Value() : type_(NIL) {}
     Value(double num) : type_(NUMBER), number_(num) {}
     Value(const std::string& str) : type_(STRING), string_(str) {}
     Value(bool b) : type_(BOOLEAN), boolean_(b) {}
     
+
     Type getType() const { return type_; }
     double asNumber() const { return number_; }
     std::string asString() const { return string_; }
@@ -54,7 +56,7 @@ private:
     bool boolean_ = false;
 };
 
-// ==== LEXER (TOKENIZER) ====
+// Tokenizer
 enum TokenType {
     NUMBER, STRING, IDENTIFIER,
     TRUE, FALSE, NIL, LET,
@@ -67,8 +69,8 @@ enum TokenType {
 
 struct Token {
     TokenType type;
-    std::string lexeme;
-    Value literal;
+    std::string lexeme; //Raw text
+    Value literal; //Typed runtime repr.
     int line;
 };
 
@@ -88,9 +90,9 @@ private:
         current_++;
         return true;
     }
-    char peek() { return isAtEnd() ? '\0' : source_[current_]; }
+    char peek() { return isAtEnd() ? '\0' : source_[current_]; } //look for current token
     
-    void addToken(TokenType type, Value literal = Value()) {
+    void addToken(TokenType type, Value literal = Value()) { //default is NIL
         std::string text = source_.substr(start_, current_ - start_);
         tokens_.push_back({type, text, literal, line_});
     }
@@ -171,7 +173,7 @@ public:
     }
 };
 
-// ==== ABSTRACT SYNTAX TREE ====
+// AST
 class Expr {
 public:
     virtual ~Expr() = default;
@@ -257,7 +259,7 @@ public:
     void execute(Environment& env) override;
 };
 
-// ==== ENVIRONMENT ====
+// ENV
 class Environment {
 private:
     std::map<std::string, Value> values_;
@@ -338,7 +340,7 @@ void BlockStmt::execute(Environment& env) {
     }
 }
 
-// ==== PARSER ====
+// Parser
 class Parser {
 private:
     std::vector<Token> tokens_;
@@ -483,7 +485,7 @@ public:
     }
 };
 
-// ==== INTERPRETER ====
+// Interpreter 
 class Interpreter {
 private:
     Environment global_;
